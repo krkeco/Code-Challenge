@@ -10,13 +10,15 @@ TAPP Code Challenge for Software Engineer Candidates
 
 ## Candidate Information (Fill out with your info)
 
-Name: _Your Name_
+Name: Kristofer Cole
 
-Email: _Your email_
+Email: krkeco@gmail.com
 
-Resume: _link to your resume_
+Resume: In repository
 
-Additional: _Such as Github or LinkedIn, etc_
+Additional: 
+	###github: krkeco (https://github.com/krkeco)
+	###linkedin: krkeco (https://www.linkedin.com/in/krkeco/)
 
 ## Intro
 

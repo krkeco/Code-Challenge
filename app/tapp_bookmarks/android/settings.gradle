@@ -1,0 +1,3 @@
+rootProject.name = 'tapp_bookmarks'
+
+include ':app'
