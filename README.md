@@ -14,7 +14,7 @@ Name: Kristofer Cole
 
 Email: krkeco@gmail.com
 
-Resume: In repository
+Resume: In repositoryn
 
 Additional: 
 	###github: krkeco (https://github.com/krkeco)
