@@ -7,19 +7,35 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Platform, StyleSheet, Text, TouchableOpacity, FlatList, View} from 'react-native';
 
 type Props = {};
 export default class Bookmarks extends Component<Props> {
   constructor(props){
     super(props);
     this.state = {
+      time: 'Morning',
       places: [
-        // {name: 'KFC'},
-        // {name: 'MacDannies'},
+        {name: 'KFC'},
+        {name: 'MacDannies'},
 
       ],
     }
+  }
+  componentDidMount(){
+    let d = new Date(); 
+    let hours = d.getHours();
+    
+    if(hours>= 18){
+      this.setState({time: 'Evening'});
+    }else if (hours  >= 12){
+      this.setState({time: 'Afternoon'});
+    }
+
+  }
+
+  static navigationOptions = {
+    header: null
   }
   render() {
 
@@ -27,7 +43,7 @@ export default class Bookmarks extends Component<Props> {
     <View style={styles.hudContainer}>
       
       <View style={{flex: 1, flexDirection: 'column'}}>
-        <Text style={[styles.primaryText,styles.left]}>Good Day ...</Text>
+        <Text style={[styles.primaryText,styles.left]}>Good {this.state.time}</Text>
         <Text style={[styles.secondaryText,styles.left]}>Today's weather is...</Text>
       </View>
 
@@ -39,7 +55,7 @@ export default class Bookmarks extends Component<Props> {
 
     </View> ;
 
-    let Places = <View style={styles.placesContainer}>
+    let Places = <View style={styles.emptyPlacesContainer}>
      <View style={{flex: 1,justifyContent: 'flex-start',alignItems: 'center', flexDirection: 'column'}}>
         
       <Text  style={[styles.primaryText,styles.middle]}>This trip is empty</Text>
@@ -51,17 +67,25 @@ export default class Bookmarks extends Component<Props> {
     </View>
 
     if(this.state.places.length != 0){
-        Places = <View>
-          {this.state.places.map((place,index) => {
-            return <View key={index}>
-            <Text>{place.name}</Text>
-            <Button
-              title="Place"
-              onPress={() => this.props.navigation.push('Places')}
-            />    
-            </View>
-          })
+        Places = <View style={styles.placesContainer} >
+          <FlatList
+            horizontal={true}
+            data={this.state.places}
+            renderItem={({item}) => 
+            
+            <TouchableOpacity
+              key={item.name}
+              style={styles.placesModal}
+              onPress={() => this.props.navigation.push('Places')}>
+
+              <Text>{item.name}</Text>
+
+              <Text  style={[styles.primaryText,styles.middle]}>This trip is empty</Text>
+            </TouchableOpacity>    
+            
           }
+          />
+
         </View>
       }
 
@@ -97,10 +121,11 @@ const styles = StyleSheet.create({
   hudContainer: {
     flex: 1,
     margin: 20, 
+    marginTop: 40,
 
     flexDirection: 'row', 
   },
-  placesContainer: {
+  emptyPlacesContainer: {
     flex: 5,
     margin: 20, 
     
@@ -108,6 +133,22 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start', 
     flexDirection: 'row',
   },
+
+  placesContainer: {
+    flex: 5,
+    
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start', 
+    flexDirection: 'row',
+  },
+  placesModal:{
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 200,
+    height: 200,
+    marginLeft: 20,
+  },
+
   locationInfoContainer:{
     flex: 1,
     margin: 20, 

@@ -12,6 +12,10 @@ import {Platform, StyleSheet, Text, View} from 'react-native';
 
 type Props = {};
 export default class MainNavigation extends Component<Props> {
+  
+  static navigationOptions = {
+    header: null
+  }
   render() {
     return (
       <View style={styles.container}>

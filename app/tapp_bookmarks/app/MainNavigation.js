@@ -26,7 +26,8 @@ const AppNavigator = createStackNavigator(
   },
   {
     initialRouteName: "Bookmarks"
-  }
+  },
+ 
 );
 
 
