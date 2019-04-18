@@ -9,6 +9,8 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, TouchableOpacity, FlatList, View} from 'react-native';
 
+// import API_KEY from './keys';
+
 type Props = {};
 export default class Bookmarks extends Component<Props> {
   constructor(props){
