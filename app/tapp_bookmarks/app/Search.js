@@ -19,6 +19,9 @@ import {
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 
+const API_KEY = 'AIzaSyBHOpLEokznL9Bfd8Zbd6ZD7no-So5ECbE';
+
+
 type Props = {};
 export default class Search extends Component<Props> {
   constructor(props) {
@@ -28,24 +31,40 @@ export default class Search extends Component<Props> {
       addressQuery: '',
       predictions: [],
       photoReference: null,
+      formattedAddress: 'Brooklyn+Bridge,New+York,NY',
+      lat: 40.718217,
+      lng: -73.998284,
     };
   }
 
 
   render() {
-    let imahe =   null;
+
+    let imahe = null;
 
     if(this.state.photoReference != null){
+
+    let map = 'https://maps.googleapis.com/maps/api/staticmap'
+    +'?center='+this.state.lat+','+this.state.lng
+    +'&zoom=13&size=600x300'
+    +'&maptype=roadmap'
+    +'&markers=color:red%7Clabel:C%7C+'+this.state.lat+','+this.state.lng
+    +'&key='+API_KEY;
+
       let photoUri = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
       +this.state.photoReference
-      +'&key=AIzaSyBHOpLEokznL9Bfd8Zbd6ZD7no-So5ECbE'
+      +'&key='+API_KEY;
+
       imahe =  <View>
-    <Image style={{width:100,height:100}} source={{uri: photoUri}}/>
-     </View>;
+      <Image style={{width:100,height:100}} source={{uri: map}}/>
+        <Image style={{width:100,height:100}} source={{uri: photoUri}}/>
+      </View>;
      }
     return (
       <View style={styles.container}>
       {imahe}
+
+        
       <GooglePlacesAutocomplete
       placeholder='Search'
       minLength={2} // minimum length of text to search
@@ -57,17 +76,23 @@ export default class Search extends Component<Props> {
       renderDescription={row => row.description} // custom description render
       onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
         console.log(data, details);
-        // alert(JSON.stringify(details.photos[0].photo_reference))
-        this.setState({photoReference: details.photos[0].photo_reference});
+        alert(JSON.stringify(details.geometry.location))
+        this.setState({
+          photoReference: details.photos[0].photo_reference,
+          formattedAddress: details.formattedAddress,
+          lat: details.geometry.location.lat,
+          lng: details.geometry.location.lng,
+
+        });
       }}
 
       getDefaultValue={() => ''}
 
       query={{
         // available options: https://developers.google.com/places/web-service/autocomplete
-        key: 'AIzaSyBHOpLEokznL9Bfd8Zbd6ZD7no-So5ECbE',
+        key: API_KEY,
         language: 'en', // language of the results
-        types: '(cities)' // default: 'geocode'
+        types: 'establishment' // default: 'geocode'
       }}
 
 
@@ -92,7 +117,7 @@ export default class Search extends Component<Props> {
       
       debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
       renderLeftButton={null}
-      renderRightButton={() => <Text>Custom text after the input</Text>}
+      renderRightButton={() => <Text></Text>}
     />
 
 
@@ -189,5 +214,11 @@ const styles = StyleSheet.create({
   },
   predefinedPlacesDescription: {
     color: '#1faadb'
+  },
+
+  map: {
+    borderRadius: 5,
+    borderColor: 'black',
+    borderWidth: 1
   }
 });
