@@ -7,21 +7,20 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, TouchableOpacity, FlatList, View} from 'react-native';
+import {Platform, StyleSheet, ImageBackground, Text, TouchableOpacity, FlatList, View} from 'react-native';
 
-// import API_KEY from './keys';
+import { connect } from 'react-redux';
+import { addPlace } from './actions/place';
+
+const API_KEY = 'AIzaSyBHOpLEokznL9Bfd8Zbd6ZD7no-So5ECbE';
+
 
 type Props = {};
-export default class Bookmarks extends Component<Props> {
+class Bookmarks extends Component<Props> {
   constructor(props){
     super(props);
     this.state = {
       time: 'Morning',
-      places: [
-        {name: 'KFC'},
-        {name: 'MacDannies'},
-
-      ],
     }
   }
   componentDidMount(){
@@ -68,23 +67,32 @@ export default class Bookmarks extends Component<Props> {
     
     </View>
 
-    if(this.state.places.length != 0){
+    if(this.props.places != null){
         Places = <View style={styles.placesContainer} >
           <FlatList
             horizontal={true}
-            data={this.state.places}
-            renderItem={({item}) => 
-            
-            <TouchableOpacity
-              key={item.name}
-              style={styles.placesModal}
-              onPress={() => this.props.navigation.push('Places')}>
+            data={this.props.places}
+            renderItem={({item, index}) => {
+      let bgImage = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
+      +item.photoReference
+      +'&key='+API_KEY
 
-              <Text>{item.name}</Text>
+                        
+              return <TouchableOpacity
+                key={item.name}
+                style={styles.placesModal}
+                onPress={() => this.props.navigation.push('Places')}>
+                <ImageBackground source={{uri: bgImage}} style={styles.placeImageBG}>
+                  <Text style={styles.placesSecondaryText}>{item.locale}</Text>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <Text style={styles.placesPrimaryText}>{item.name}</Text>
+                    <Text style={styles.placesPrimaryText}>{item.rating}</Text>
+                    <Text style={styles.placesPrimaryText}>ARROW</Text>
 
-              <Text  style={[styles.primaryText,styles.middle]}>This trip is empty</Text>
-            </TouchableOpacity>    
-            
+                  </View>
+                </ImageBackground>
+              </TouchableOpacity>    
+              }
           }
           />
 
@@ -94,6 +102,7 @@ export default class Bookmarks extends Component<Props> {
     let LocationInfo = <View style={styles.locationInfoContainer}>
       <Text style={styles.primaryText}>Exploring...</Text>
       <Text style={styles.secondaryText}>location, location</Text>
+
     </View>;
 
     return (
@@ -104,7 +113,6 @@ export default class Bookmarks extends Component<Props> {
       {Places}
 
       {LocationInfo}
-
 
 
       </View>
@@ -144,13 +152,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   placesModal:{
-    backgroundColor: 'red',
-    borderRadius: 10,
     width: 200,
     height: 200,
     marginLeft: 20,
   },
-
+  placeImageBG: {
+    width: '100%', 
+    height: '100%',
+    borderRadius: 10,
+  },
   locationInfoContainer:{
     flex: 1,
     margin: 20, 
@@ -183,4 +193,34 @@ const styles = StyleSheet.create({
     marginTop: 7,
     color: 'white'
   },
+  placesPrimaryText: {
+    fontSize:15,
+    color:'#FFFFFF',
+    textShadowColor:'#585858',
+    textShadowRadius:10,
+  },
+  placesSecondaryText: {
+    fontSize:10,
+    color:'#FFFFFF',
+    textShadowColor:'#585858',
+    textShadowRadius:10,
+  },
 });
+
+
+const mapStateToProps = state => {
+  return {
+    places: state.places,
+    currentPlace: state.currentPlace
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    add: (name) => {
+      dispatch(addPlace(name))
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Bookmarks)

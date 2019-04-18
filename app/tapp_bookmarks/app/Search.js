@@ -16,53 +16,36 @@ import {
   FlatList,
   Dimensions
 } from 'react-native';
+
+import { connect } from 'react-redux';
+import { addPlace } from './actions/place';
+import { setCurrentPlace } from './actions/currentPlace';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
+import { ADD_PLACE } from './actions/types';
 
-const API_KEY = 'AIzaSyBHOpLEokznL9Bfd8Zbd6ZD7no-So5ECbE';
+import {API_KEY} from './env.js'
 
 
 type Props = {};
-export default class Search extends Component<Props> {
+class Search extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
       showInput: false,
       addressQuery: '',
       predictions: [],
-      photoReference: null,
-      formattedAddress: 'Brooklyn+Bridge,New+York,NY',
-      lat: 40.718217,
-      lng: -73.998284,
+      
     };
   }
 
 
   render() {
 
-    let imahe = null;
 
-    if(this.state.photoReference != null){
-
-    let map = 'https://maps.googleapis.com/maps/api/staticmap'
-    +'?center='+this.state.lat+','+this.state.lng
-    +'&zoom=13&size=600x300'
-    +'&maptype=roadmap'
-    +'&markers=color:red%7Clabel:C%7C+'+this.state.lat+','+this.state.lng
-    +'&key='+API_KEY;
-
-      let photoUri = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
-      +this.state.photoReference
-      +'&key='+API_KEY;
-
-      imahe =  <View>
-      <Image style={{width:100,height:100}} source={{uri: map}}/>
-        <Image style={{width:100,height:100}} source={{uri: photoUri}}/>
-      </View>;
-     }
     return (
       <View style={styles.container}>
-      {imahe}
+        
 
         
       <GooglePlacesAutocomplete
@@ -76,14 +59,33 @@ export default class Search extends Component<Props> {
       renderDescription={row => row.description} // custom description render
       onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
         console.log(data, details);
-        alert(JSON.stringify(details.geometry.location))
-        this.setState({
-          photoReference: details.photos[0].photo_reference,
-          formattedAddress: details.formattedAddress,
-          lat: details.geometry.location.lat,
-          lng: details.geometry.location.lng,
 
-        });
+        // alert(JSON.stringify(details.rating+':rating component5:'+details.address_components[5].short_name))
+      
+        let newPlace = {
+            photoReference: details.photos[0].photo_reference,
+            lat: details.geometry.location.lat,
+            lng: details.geometry.location.lng,
+            formattedAddress: details.formatted_address,
+            locale: details.address_components[4].long_name+', '+details.address_components[5].short_name,
+            rating: details.rating,
+            name: details.name,
+            id: details.id,
+          };
+
+
+        if(this.props.places === null 
+        ||  !this.props.places.filter(place => (place.id === newPlace.id))){
+
+        // this.props.add(newPlace)
+      // alert(JSON.stringify(details.id))
+        this.props.setCurrentPlace(newPlace)
+        this.props.navigation.push('Places')
+        }else{
+          alert('You already have this place pinned')
+        }
+
+
       }}
 
       getDefaultValue={() => ''}
@@ -110,7 +112,7 @@ export default class Search extends Component<Props> {
       
       GooglePlacesDetailsQuery={{
         // available options for GooglePlacesDetails API : https://developers.google.com/places/web-service/details
-        fields: 'photo'
+        fields: ['photo','id']
       }}
 
       filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
@@ -120,9 +122,8 @@ export default class Search extends Component<Props> {
       renderRightButton={() => <Text></Text>}
     />
 
-
        
-      </View>
+    </View>
     );
   }
 }
@@ -222,3 +223,25 @@ const styles = StyleSheet.create({
     borderWidth: 1
   }
 });
+
+
+
+const mapStateToProps = state => {
+  return {
+    places: state.places,
+    currentPlaceId: state.currentPlaceId,
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    add: (place) => {
+      dispatch(addPlace(place))
+    },
+    setCurrentPlace: (placeId) => {
+      dispatch(setCurrentPlace(placeId))
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Search)
