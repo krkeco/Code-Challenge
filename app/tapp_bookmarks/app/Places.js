@@ -7,53 +7,71 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, Dimensions,ImageBackground, TouchableOpacity, StyleSheet, Image, Text, View} from 'react-native';
+import {Platform, AsyncStorage, Dimensions,ImageBackground, TouchableOpacity, StyleSheet, Image, Text, View} from 'react-native';
 
 import { connect } from 'react-redux';
 import { addPlace, removePlace } from './actions/place';
 
-
-import {getPhotoFromReference, getMapFromLatLng} from './utils.js';
+import {getPhotoFromReference, getMapFromLatLng, storeBookmarks} from './utils.js';
 
 const window = Dimensions.get('window');
 
+const BOOKMARKS = 'bookmarks'
 
 type Props = {};
 class Places extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      isPinned: false,
+      // isPinned: false,
       
     };
-  }
-
-  componentDidMount(){
-    this.setState({isPinned: this.props.currentPlace.isPinned})
-  }
-
-  togglePin = () => { 
-    if(!this.props.currentPlace.isPinned){
-      let place = this.props.currentPlace;
-      place.isPinned = true;
-      this.props.add(this.props.currentPlace)
-      this.setState({isPinned: true});
-    }else{
-      this.props.remove(this.props.currentPlace)
-      this.setState({isPinned: false});
-    }
   }
 
   static navigationOptions = {
     header: null
   }
 
+  componentDidMount(){
+    
+  }
+
+  togglePin = () => { 
+
+    if(this.isBookmarked(this.props.currentPlace.id)){
+
+      this.props.remove(this.props.currentPlace.id);
+      // this.setState({isPinned: false})
+    }else{
+      this.props.add(this.props.currentPlace);
+      // this.setState({isPinned: true})
+    }
+
+    
+  }
+
+
+  isBookmarked = (id) => {
+    // alert(id)
+    if(this.props.places == null ){
+      // alert('no props to check, def not bookmarked')
+      return false
+    }else{
+      if(this.props.places.findIndex(place => place.id === id) !== -1){
+        // alert('this is a bookmarked place')
+        return true
+      }else{
+        // alert('NOT bookmarked place')
+        return false
+      }
+    }
+  }
 
 
   render() {
     let buttonText = "Pin to Trip";
     let buttonColor = '#4000b1'
-    if(this.state.isPinned){
+    if(this.isBookmarked(this.props.currentPlace.id)){
       buttonText = "Pinned to Trip";
       buttonColor = '#00ff31'
     }
@@ -78,8 +96,6 @@ class Places extends Component<Props> {
 
           
 
-          <Text style={styles.welcome}>id:  {this.props.currentPlace.id}</Text>
-        
         </ImageBackground>
       </View>
     );
@@ -93,16 +109,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
   pinButton: {
     flex: 1,
     justifyContent: 'center',
@@ -113,7 +119,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   
   },
-
   primaryText: {
     fontSize: 24,
     
@@ -146,7 +151,7 @@ const mapDispatchToProps = dispatch => {
     },
     remove: (placeId) => {
       dispatch(removePlace(placeId))
-    }
+    },
   }
 }
 

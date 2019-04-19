@@ -7,14 +7,15 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, ImageBackground, Text, TouchableOpacity, FlatList, View} from 'react-native';
+import {Platform, AsyncStorage,StyleSheet, ImageBackground, Text, TouchableOpacity, FlatList, View} from 'react-native';
 
 import { connect } from 'react-redux';
-import { addPlace } from './actions/place';
+import { addPlace, setFromStorage } from './actions/place';
+import { setCurrentPlace } from './actions/currentPlace';
 
 import {getPhotoFromReference} from './utils.js';
 
-
+const BOOKMARKS = 'bookmarks'
 const explorerRef = 'CmRaAAAAV9KxpdXWzTMaruLTL1Hrh82ZQ-50ksuNTTtdwTgiWgJpHHKDQ0WKpjSnZABBJRpJZkEluaLI-U8YdJp_WyuD1otsSafhjFVKlFTrW_kpXjaI2hUyzgj6aWvdcmgXrz1_EhAL-RmXTf3Jn4afw2CAHkDrGhT_ibn5dfC4ThZ6v89u01UWp3L4Cw';
 
 type Props = {};
@@ -36,12 +37,46 @@ class Bookmarks extends Component<Props> {
       this.setState({time: 'Afternoon'});
     }
 
+    this.getBookmarksFromStorage();
+    // this.deleteBookmarks();
+    // alert(JSON.stringify(this.props.places))
+  }
 
+
+  deleteBookmarks = async () => {
+
+    try {
+      await AsyncStorage.setItem(BOOKMARKS, '');
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+
+  getBookmarksFromStorage = async() => {
+    // let Bookmarks = JSON.parse(res);
+    try {
+    let res = await AsyncStorage.getItem(BOOKMARKS);
+    if(res !== null){
+        // alert('set bookmarks from storage')
+        // alert(res)
+        let places = JSON.parse(res);
+        // alert(places)
+        places.map((place) => {
+        this.props.add(place) 
+          
+        })
+      }else{
+        //no stored bookmarks
+      }
+    
+    
+    } catch (error) {
+      alert(error)
+      console.log(error)
+    }
   }
-  
-  componentWillReceiveProps(){
-    this.forceUpdate();
-  }
+
 
   static navigationOptions = {
     header: null
@@ -52,8 +87,8 @@ class Bookmarks extends Component<Props> {
     <ImageBackground source={require('./img/morning.jpg')} style={[styles.hudContainer,styles.placeImageBG]}>
       
       <View style={{flex: 1, flexDirection: 'column'}}>
-        <Text style={[styles.primaryText,styles.left]}>Good {this.state.time}</Text>
-        <Text style={[styles.secondaryText,styles.left]}>Today's weather is...</Text>
+        <Text style={[styles.headerPrimaryText,styles.left]}>Good {this.state.time}</Text>
+        <Text style={[styles.headerSecondaryText,styles.left]}>Today's weather is...</Text>
       </View>
 
       <TouchableOpacity
@@ -81,15 +116,14 @@ class Bookmarks extends Component<Props> {
             horizontal={true}
             data={this.props.places}
             renderItem={({item, index}) => {
-            
-            let bgImage =getPhotoFromReference(item.photoReference);
-
-                        
               return <TouchableOpacity
                 key={item.name}
                 style={styles.placesModal}
-                onPress={() => this.props.navigation.push('Places')}>
-                <ImageBackground source={{uri: bgImage}} style={styles.placeImageBG}>
+                onPress={() => {
+                  this.props.setCurrentPlace(item);
+                  this.props.navigation.push('Places');
+                }}>
+                <ImageBackground source={{uri: getPhotoFromReference(item.photoReference)}} style={styles.placeImageBG}>
                   <Text style={styles.placesSecondaryText}>{item.locale}</Text>
                   <View style={{flex: 1, flexDirection: 'row'}}>
                     <Text style={styles.placesPrimaryText}>{item.name}</Text>
@@ -107,8 +141,8 @@ class Bookmarks extends Component<Props> {
       }
 
     let LocationInfo = <ImageBackground source={{uri: getPhotoFromReference(explorerRef)}} style={[styles.placeImageBG,styles.locationInfoContainer]}>
-      <Text style={styles.primaryText}>Exploring...</Text>
-      <Text style={styles.secondaryText}>location, location</Text>
+      <Text style={styles.locationPrimaryText}>Exploring...</Text>
+      <Text style={styles.locationSecondaryText}>location, location</Text>
 
     </ImageBackground>;
 
@@ -175,14 +209,26 @@ const styles = StyleSheet.create({
     padding: 20, 
   },
 
+  headerPrimaryText: {
+    fontSize: 28,
+    color:'black'
+    
+  },
+  headerSecondaryText: {
+    fontSize: 14,
+    marginBottom: 5,
+    color:'black'
+  },
   primaryText: {
-    fontSize: 24,
+    marginTop: 10,
+    fontSize: 18,
+    color: '#888',
     
   },
   secondaryText: {
-    fontSize: 14,
-    color: '#333333',
+    fontSize: 12,
     marginBottom: 5,
+    color: '#888',
   },
   left: {
     textAlign: 'left',
@@ -214,6 +260,18 @@ const styles = StyleSheet.create({
     textShadowColor:'#585858',
     textShadowRadius:10,
   },
+  locationPrimaryText: {
+    fontSize:20,
+    color:'#FFFFFF',
+    textShadowColor:'#585858',
+    textShadowRadius:10,
+  },
+  locationSecondaryText: {
+    fontSize:15,
+    color:'#FFFFFF',
+    textShadowColor:'#585858',
+    textShadowRadius:10,
+  },
 });
 
 
@@ -228,6 +286,9 @@ const mapDispatchToProps = dispatch => {
   return {
     add: (name) => {
       dispatch(addPlace(name))
+    },
+    setCurrentPlace: (place) => {
+      dispatch(setCurrentPlace(place))
     }
   }
 }

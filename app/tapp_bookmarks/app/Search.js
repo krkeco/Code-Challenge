@@ -73,8 +73,8 @@ class Search extends Component<Props> {
 
         // alert(JSON.stringify(details.rating+':rating component5:'+details.address_components[5].short_name))
       
-        let name = this.checkValid(details.address_components[5])
-        alert(name)
+        // let name = this.checkValid(details.address_components[5])
+        // alert(name)
         let newPlace = {
             photoReference: details.photos[0].photo_reference ,
             lat: details.geometry.location.lat,
@@ -84,27 +84,20 @@ class Search extends Component<Props> {
             rating: details.rating,
             name: details.name,
             id: details.id,
-            isPinned: false,
           };
 
 
-        if(this.props.places === null) {
+        // if(this.props.places === null) {
+          this.props.setCurrentPlace(newPlace)
+          this.props.navigation.push('Places')
 
-        this.props.setCurrentPlace(newPlace)
-        
+        // }else if(this.props.places.filter(place => (place.id === newPlace.id))){
+        //   this.props.setCurrentPlace(newPlace)
+        //   this.props.navigation.push('Places')
 
-        this.props.navigation.push('Places')
-
-
-        }else if(this.props.places.filter(place => (place.id === newPlace.id))){
-
-        // this.props.add(newPlace)
-      // alert(JSON.stringify(details.id))
-        this.props.setCurrentPlace(newPlace)
-        this.props.navigation.push('Places')
-        }else{
-          alert('You already have this place pinned')
-        }
+        // }else{
+        //   alert('You already have this place pinned')
+        // }
 
 
       }}
@@ -259,8 +252,8 @@ const mapDispatchToProps = dispatch => {
     add: (place) => {
       dispatch(addPlace(place))
     },
-    setCurrentPlace: (placeId) => {
-      dispatch(setCurrentPlace(placeId))
+    setCurrentPlace: (place) => {
+      dispatch(setCurrentPlace(place))
     }
   }
 }
