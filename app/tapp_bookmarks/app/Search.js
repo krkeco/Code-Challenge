@@ -39,6 +39,17 @@ class Search extends Component<Props> {
     };
   }
 
+  static navigationOptions = {
+    header: null
+  }
+
+  checkValid = (string) => {
+    if(string !== undefined && string !== null){
+      return string
+    }else{
+      return 'not available'
+    }
+  }
 
   render() {
 
@@ -62,20 +73,30 @@ class Search extends Component<Props> {
 
         // alert(JSON.stringify(details.rating+':rating component5:'+details.address_components[5].short_name))
       
+        let name = this.checkValid(details.address_components[5])
+        alert(name)
         let newPlace = {
-            photoReference: details.photos[0].photo_reference,
+            photoReference: details.photos[0].photo_reference ,
             lat: details.geometry.location.lat,
             lng: details.geometry.location.lng,
             formattedAddress: details.formatted_address,
-            locale: details.address_components[4].long_name+', '+details.address_components[5].short_name,
+            locale: details.address_components[4].long_name+', ',
             rating: details.rating,
             name: details.name,
             id: details.id,
+            isPinned: false,
           };
 
 
-        if(this.props.places === null 
-        ||  !this.props.places.filter(place => (place.id === newPlace.id))){
+        if(this.props.places === null) {
+
+        this.props.setCurrentPlace(newPlace)
+        
+
+        this.props.navigation.push('Places')
+
+
+        }else if(this.props.places.filter(place => (place.id === newPlace.id))){
 
         // this.props.add(newPlace)
       // alert(JSON.stringify(details.id))

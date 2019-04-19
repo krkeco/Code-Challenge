@@ -7,59 +7,80 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Image, Text, View} from 'react-native';
+import {Platform, Dimensions,ImageBackground, TouchableOpacity, StyleSheet, Image, Text, View} from 'react-native';
 
 import { connect } from 'react-redux';
-import { addPlace } from './actions/place';
+import { addPlace, removePlace } from './actions/place';
 
 
+import {getPhotoFromReference, getMapFromLatLng} from './utils.js';
 
-import {API_KEY} from './env.js'
+const window = Dimensions.get('window');
 
 
 type Props = {};
 class Places extends Component<Props> {
-  
+  constructor(props) {
+    super(props);
+    this.state = {
+      isPinned: false,
+      
+    };
+  }
+
+  componentDidMount(){
+    this.setState({isPinned: this.props.currentPlace.isPinned})
+  }
+
+  togglePin = () => { 
+    if(!this.props.currentPlace.isPinned){
+      let place = this.props.currentPlace;
+      place.isPinned = true;
+      this.props.add(this.props.currentPlace)
+      this.setState({isPinned: true});
+    }else{
+      this.props.remove(this.props.currentPlace)
+      this.setState({isPinned: false});
+    }
+  }
+
   static navigationOptions = {
     header: null
   }
+
+
+
   render() {
-
-    let imahe = null;
-
-
-    let map = 'https://maps.googleapis.com/maps/api/staticmap'
-    +'?center='+this.props.currentPlace.lat+','+this.props.currentPlace.lng
-    +'&zoom=13&size=600x300'
-    +'&maptype=roadmap'
-    +'&markers=color:red%7Clabel:C%7C+'+this.props.currentPlace.lat+','+this.props.currentPlace.lng
-    +'&key='+API_KEY;
-
-      let photoUri = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
-      +this.props.currentPlace.photoReference
-      +'&key='+API_KEY;
-
-      imahe =  <View>
-      <Image style={{width:100,height:100}} source={{uri: map}}/>
-        <Image style={{width:100,height:100}} source={{uri: photoUri}}/>
-      </View>;
-
+    let buttonText = "Pin to Trip";
+    let buttonColor = '#4000b1'
+    if(this.state.isPinned){
+      buttonText = "Pinned to Trip";
+      buttonColor = '#00ff31'
+    }
 
     return (
       <View style={styles.container}>
-        <View style={{flex:3}}>
-        <Image style={{width:'100%',height:'100%'}} source={{uri: photoUri}}/>
-        </View>
-        <View style={{flex:2}}>
+        <ImageBackground 
+          source={{uri: getPhotoFromReference(this.props.currentPlace.photoReference)}} 
+          style={{flex:3, width: '100%', height: '100%',justifyContent: 'flex-end'}}>
+            <Text style={[styles.SecondaryText,styles.left]}>{this.props.currentPlace.locale}</Text>
+            <Text style={[styles.PrimaryText,styles.left]}>{this.props.currentPlace.name} - {this.props.currentPlace.rating}</Text>
+        </ImageBackground>
+          <TouchableOpacity 
+            onPress={this.togglePin}
+            style={[styles.pinButton,{backgroundColor:buttonColor}]} >
+            <Text>{buttonText}</Text>
+          </TouchableOpacity>
+          <Text style={styles.welcome}>address {this.props.currentPlace.formatted_address}</Text>
+        <ImageBackground 
+          style={{flex:2, width: '100%', height: '100%'}}  
+          source={{uri: getMapFromLatLng(this.props.currentPlace.lat,this.props.currentPlace.lng)}}>
 
-          <Image style={{width:100,height:100}} source={{uri: map}}/>
-
-          <Text style={styles.welcome}>{this.props.currentPlace.name}</Text>
           
-          <Text style={styles.welcome}>{this.props.currentPlace.address}</Text>
 
           <Text style={styles.welcome}>id:  {this.props.currentPlace.id}</Text>
-        </View>
+        
+        </ImageBackground>
       </View>
     );
   }
@@ -82,6 +103,32 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  pinButton: {
+    flex: 1,
+    justifyContent: 'center',
+
+    width:'90%',
+    height: 20,
+    margin: 10, 
+    borderRadius: 30,
+  
+  },
+
+  primaryText: {
+    fontSize: 24,
+    
+  },
+  secondaryText: {
+    fontSize: 14,
+    color: '#333333',
+    marginBottom: 5,
+  },
+  left: {
+    textAlign: 'left',
+  },
+  middle: {
+    textAlign: 'center',
+  },
 });
 
 
@@ -96,6 +143,9 @@ const mapDispatchToProps = dispatch => {
   return {
     add: (place) => {
       dispatch(addPlace(place))
+    },
+    remove: (placeId) => {
+      dispatch(removePlace(placeId))
     }
   }
 }

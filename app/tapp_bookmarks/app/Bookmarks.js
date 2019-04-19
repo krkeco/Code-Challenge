@@ -12,8 +12,10 @@ import {Platform, StyleSheet, ImageBackground, Text, TouchableOpacity, FlatList,
 import { connect } from 'react-redux';
 import { addPlace } from './actions/place';
 
-const API_KEY = 'AIzaSyBHOpLEokznL9Bfd8Zbd6ZD7no-So5ECbE';
+import {getPhotoFromReference} from './utils.js';
 
+
+const explorerRef = 'CmRaAAAAV9KxpdXWzTMaruLTL1Hrh82ZQ-50ksuNTTtdwTgiWgJpHHKDQ0WKpjSnZABBJRpJZkEluaLI-U8YdJp_WyuD1otsSafhjFVKlFTrW_kpXjaI2hUyzgj6aWvdcmgXrz1_EhAL-RmXTf3Jn4afw2CAHkDrGhT_ibn5dfC4ThZ6v89u01UWp3L4Cw';
 
 type Props = {};
 class Bookmarks extends Component<Props> {
@@ -21,6 +23,7 @@ class Bookmarks extends Component<Props> {
     super(props);
     this.state = {
       time: 'Morning',
+      location: '',
     }
   }
   componentDidMount(){
@@ -33,15 +36,20 @@ class Bookmarks extends Component<Props> {
       this.setState({time: 'Afternoon'});
     }
 
+
+  }
+  
+  componentWillReceiveProps(){
+    this.forceUpdate();
   }
 
   static navigationOptions = {
     header: null
   }
   render() {
-
+    
     let HUD = 
-    <View style={styles.hudContainer}>
+    <ImageBackground source={require('./img/morning.jpg')} style={[styles.hudContainer,styles.placeImageBG]}>
       
       <View style={{flex: 1, flexDirection: 'column'}}>
         <Text style={[styles.primaryText,styles.left]}>Good {this.state.time}</Text>
@@ -54,7 +62,7 @@ class Bookmarks extends Component<Props> {
       <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
 
-    </View> ;
+    </ImageBackground> ;
 
     let Places = <View style={styles.emptyPlacesContainer}>
      <View style={{flex: 1,justifyContent: 'flex-start',alignItems: 'center', flexDirection: 'column'}}>
@@ -73,9 +81,8 @@ class Bookmarks extends Component<Props> {
             horizontal={true}
             data={this.props.places}
             renderItem={({item, index}) => {
-      let bgImage = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference='
-      +item.photoReference
-      +'&key='+API_KEY
+            
+            let bgImage =getPhotoFromReference(item.photoReference);
 
                         
               return <TouchableOpacity
@@ -99,11 +106,11 @@ class Bookmarks extends Component<Props> {
         </View>
       }
 
-    let LocationInfo = <View style={styles.locationInfoContainer}>
+    let LocationInfo = <ImageBackground source={{uri: getPhotoFromReference(explorerRef)}} style={[styles.placeImageBG,styles.locationInfoContainer]}>
       <Text style={styles.primaryText}>Exploring...</Text>
       <Text style={styles.secondaryText}>location, location</Text>
 
-    </View>;
+    </ImageBackground>;
 
     return (
       <View style={{flex: 1}}>
@@ -130,8 +137,9 @@ const styles = StyleSheet.create({
   },
   hudContainer: {
     flex: 1,
-    margin: 20, 
-    marginTop: 40,
+    padding: 20, 
+    paddingTop: 40,
+
 
     flexDirection: 'row', 
   },
@@ -162,8 +170,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   locationInfoContainer:{
-    flex: 1,
-    margin: 20, 
+    flex: 4,
+    justifyContent: 'flex-end',
+    padding: 20, 
   },
 
   primaryText: {
