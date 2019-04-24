@@ -23,7 +23,6 @@ class Places extends Component<Props> {
   constructor(props) {
     super(props);
     this.state = {
-      // isPinned: false,
       
     };
   }
@@ -33,47 +32,48 @@ class Places extends Component<Props> {
   }
 
   componentDidMount(){
-    
+   
   }
 
   togglePin = () => { 
 
     if(this.isBookmarked(this.props.currentPlace.id)){
-
       this.props.remove(this.props.currentPlace.id);
-      // this.setState({isPinned: false})
+
     }else{
       this.props.add(this.props.currentPlace);
-      // this.setState({isPinned: true})
     }
-
     
   }
 
-
   isBookmarked = (id) => {
-    // alert(id)
+
     if(this.props.places == null ){
-      // alert('no props to check, def not bookmarked')
       return false
+    
     }else{
       if(this.props.places.findIndex(place => place.id === id) !== -1){
-        // alert('this is a bookmarked place')
         return true
+    
       }else{
-        // alert('NOT bookmarked place')
         return false
+    
       }
     }
   }
 
+  goBack = () => {
+    this.props.navigation.goBack();
+  }
 
   render() {
     let buttonText = "Pin to Trip";
-    let buttonColor = '#4000b1'
+    let buttonColor = '#4000b1';
+    let textColor = 'white';
     if(this.isBookmarked(this.props.currentPlace.id)){
       buttonText = "Pinned to Trip";
-      buttonColor = '#00ff31'
+      buttonColor = '#00ff31';
+      textColor = 'black';
     }
 
     return (
@@ -97,13 +97,21 @@ class Places extends Component<Props> {
         </ImageBackground>
 
         <TouchableOpacity 
+          onPress={this.goBack}
+          style={{position: 'absolute', top: 30, left: 10, backgroundColor: 'black', borderRadius: 15, width: 30, height: 30}}>
+          <Image source={require('./img/back.png')}
+          style={{width: 20, height:20, margin: 5}}/>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
           onPress={this.togglePin}
           style={[styles.pinButton,{backgroundColor:buttonColor}]} >
-          <Text style={styles.pinButtonText}>{buttonText}</Text>
+          <Text style={[styles.pinButtonText,{color: textColor}]}>{buttonText}</Text>
         </TouchableOpacity>
        
-        <Text style={styles.welcome}>{this.props.currentPlace.formatted_address}</Text>
-       
+       <View style={{margin: 5, height: 30, width: '100%'}}>
+        <Text style={[styles.addressText]}>{this.props.currentPlace.formattedAddress}</Text>
+       </View>
         <Image 
           style={{flex:2, width: '100%', height: '100%'}}  
           source={{uri: getMapFromLatLng(this.props.currentPlace.lat,this.props.currentPlace.lng)}}/>
@@ -122,7 +130,6 @@ const styles = StyleSheet.create({
   },
   pinButton: {
     justifyContent: 'center',
-
     width:'90%',
     height: 50,
     margin: 10, 
@@ -138,7 +145,6 @@ const styles = StyleSheet.create({
     color: 'white',
     textShadowColor:'#585858',
     textShadowRadius:10,
-    
   },
   secondaryText: {
     fontSize: 16,
@@ -147,8 +153,13 @@ const styles = StyleSheet.create({
     textShadowRadius:10,
     marginBottom: 5,
   },
+  addressText: {
+    color: 'black',
+    fontSize: 12,
+  },
   left: {
     textAlign: 'left',
+    marginLeft: 5,
   },
   middle: {
     textAlign: 'center',

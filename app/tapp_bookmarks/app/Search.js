@@ -67,43 +67,69 @@ class Search extends Component<Props> {
       keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
       listViewDisplayed='auto'    // true/false/undefined
       fetchDetails={true}
+      styles={{
+        textInputContainer: {
+          backgroundColor: 'rgba(0,0,0,0)',
+          borderTopWidth: 0,
+          borderBottomWidth:0
+        },
+        textInput: {
+          marginLeft: 0,
+          marginRight: 0,
+          height: 38,
+          color: '#555',
+          fontSize: 16,
+          backgroundColor: '#ddd',
+        },
+      }}
       renderDescription={row => row.description} // custom description render
       onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
         console.log(data, details);
 
-        // alert(JSON.stringify(details.rating+':rating component5:'+details.address_components[5].short_name))
-      
-        // let name = this.checkValid(details.address_components[5])
-        // alert(name)
+        // alert(JSON.stringify(details.address_components))
+        let addressString = ''
+        let localeString = ''
+        details.address_components.forEach((type) => {
+          // address_string += type.long_name + ' ';
+
+          if(type.types.indexOf('route') != -1
+          || type.types.indexOf('street_number') != -1
+          || type.types.indexOf('sublocality_level_1') != -1
+            ){
+            if(type.types.indexOf('route') == -1){
+              addressString += type.long_name + ', ';
+            }else{
+              addressString += type.long_name + ' ';
+            }
+          }
+          
+          if(type.types.indexOf('sublocality_level_1') != -1
+          || type.types.indexOf('administrative_area_level_1') != -1
+          || type.types.indexOf('country') != -1
+            ){
+            localeString += type.long_name;
+            if(type.types.indexOf('country') == -1){
+              localeString += ', '
+            }
+          }
+
+        })
+
         let newPlace = {
             photoReference: details.photos[0].photo_reference ,
             lat: details.geometry.location.lat,
             lng: details.geometry.location.lng,
-            formattedAddress: details.formatted_address,
-            locale: details.address_components[4].long_name+', ',
+            formattedAddress: addressString,
+            locale: localeString,
             rating: details.rating,
             name: details.name,
             id: details.id,
           };
-
-
-        // if(this.props.places === null) {
           this.props.setCurrentPlace(newPlace)
           this.props.navigation.push('Places')
-
-        // }else if(this.props.places.filter(place => (place.id === newPlace.id))){
-        //   this.props.setCurrentPlace(newPlace)
-        //   this.props.navigation.push('Places')
-
-        // }else{
-        //   alert('You already have this place pinned')
-        // }
-
-
       }}
 
       getDefaultValue={() => ''}
-
       query={{
         // available options: https://developers.google.com/places/web-service/autocomplete
         key: API_KEY,
@@ -133,7 +159,10 @@ class Search extends Component<Props> {
       
       debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
       renderLeftButton={null}
-      renderRightButton={() => <Text></Text>}
+      renderRightButton={() => 
+        <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+          <Text style={{fontSize: 16, margin: 16, color: '#1faadb'}}>Cancel</Text>
+        </TouchableOpacity>}
     />
 
        
