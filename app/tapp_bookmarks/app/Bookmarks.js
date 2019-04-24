@@ -7,13 +7,13 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, AsyncStorage,StyleSheet, ImageBackground, Text, TouchableOpacity, FlatList, View} from 'react-native';
+import {Platform, AsyncStorage,StyleSheet, ImageBackground,Image, Text, TouchableOpacity, FlatList, View} from 'react-native';
 
 import { connect } from 'react-redux';
 import { addPlace, setFromStorage } from './actions/place';
 import { setCurrentPlace } from './actions/currentPlace';
 
-import {getPhotoFromReference, firebase, getFirebaseBookmarks} from './utils.js';
+import {getPhotoFromReference, firebase} from './utils.js';
 
 const BOOKMARKS = 'bookmarks'
 const explorerRef = 'CmRaAAAAV9KxpdXWzTMaruLTL1Hrh82ZQ-50ksuNTTtdwTgiWgJpHHKDQ0WKpjSnZABBJRpJZkEluaLI-U8YdJp_WyuD1otsSafhjFVKlFTrW_kpXjaI2hUyzgj6aWvdcmgXrz1_EhAL-RmXTf3Jn4afw2CAHkDrGhT_ibn5dfC4ThZ6v89u01UWp3L4Cw';
@@ -28,6 +28,9 @@ class Bookmarks extends Component<Props> {
     }
   }
 
+  componentWillMount(){
+    getFirebaseBookmarks(this.props.add);
+  }
 
 
   componentDidMount(){
@@ -40,17 +43,9 @@ class Bookmarks extends Component<Props> {
       this.setState({time: 'Afternoon'});
     }
     
-    
+    //Originally wasn't sure if I was going to use firebase, but ended up using it.
     // this.getBookmarksFromStorage();
 
-    getFirebaseBookmarks(this.props.add);
-    // .then(
-    //     FBPlaces.map((place) =>{
-    //       // this.props.add(place)
-    //       alert('a place')
-    //     }))
-    // this.deleteBookmarks();
-    // alert(JSON.stringify(this.props.places))
   }
 
 
@@ -99,6 +94,7 @@ class Bookmarks extends Component<Props> {
       
       <View style={{flex: 1, flexDirection: 'column'}}>
         <Text style={[styles.headerPrimaryText,styles.left]}>Good {this.state.time}</Text>
+                            
         <Text style={[styles.headerSecondaryText,styles.left]}>Today's weather is...</Text>
       </View>
 
@@ -134,13 +130,28 @@ class Bookmarks extends Component<Props> {
                   this.props.setCurrentPlace(item);
                   this.props.navigation.push('Places');
                 }}>
-                <ImageBackground source={{uri: getPhotoFromReference(item.photoReference)}} style={styles.placeImageBG}>
-                  <Text style={styles.placesSecondaryText}>{item.locale}</Text>
-                  <View style={{flex: 1, flexDirection: 'row'}}>
-                    <Text style={styles.placesPrimaryText}>{item.name}</Text>
-                    <Text style={styles.placesPrimaryText}>{item.rating}</Text>
-                    <Text style={styles.placesPrimaryText}>ARROW</Text>
+                <ImageBackground 
+                  source={{uri: getPhotoFromReference(item.photoReference)}} 
+                  imageStyle={{ borderRadius: 15 }}
+                  style={styles.placeImageBG}>
 
+
+                  <View style={{flex:1, margin: 10, flexDirection:'column', justifyContent: 'flex-end'}}>
+                    
+                    <View style={{height: 20, flexDirection: 'row'}}>
+
+                      <Text style={[styles.placesSecondaryText,{height:15}]}>{item.locale}</Text>
+
+                        <View style={{backgroundColor: '#4000b1', borderRadius: 5, marginRight: 5, width: 40, height: 15}}>
+                          <View style={{flex:1, flexDirection:'row'}}>
+                            <Image style={{width: 10, height: 10, margin: 5, marginTop:3}} source={require('./img/heartWhite.png')}/>
+                            <Text style={styles.placesSecondaryText}>{item.rating}</Text>
+                          </View>
+                        </View>
+
+                    </View>
+
+                      <Text style={styles.placesPrimaryText}>{item.name}</Text>
                   </View>
                 </ImageBackground>
               </TouchableOpacity>    
@@ -208,11 +219,11 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     marginLeft: 20,
+    marginTop: 5,
   },
   placeImageBG: {
     width: '100%', 
     height: '100%',
-    borderRadius: 10,
   },
   locationInfoContainer:{
     flex: 4,

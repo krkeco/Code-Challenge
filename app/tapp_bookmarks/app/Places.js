@@ -81,22 +81,33 @@ class Places extends Component<Props> {
         <ImageBackground 
           source={{uri: getPhotoFromReference(this.props.currentPlace.photoReference)}} 
           style={{flex:3, width: '100%', height: '100%',justifyContent: 'flex-end'}}>
-            <Text style={[styles.SecondaryText,styles.left]}>{this.props.currentPlace.locale}</Text>
-            <Text style={[styles.PrimaryText,styles.left]}>{this.props.currentPlace.name} - {this.props.currentPlace.rating}</Text>
+            <Text style={[styles.secondaryText,styles.left]}>{this.props.currentPlace.locale}</Text>
+
+            <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+              <Text style={[styles.primaryText,styles.left]}>{this.props.currentPlace.name} </Text>
+
+              <View style={{backgroundColor: 'white', borderRadius: 10, marginRight: 5,marginTop:5, width: 50, height: 25}}>
+                <View style={{flex:1, flexDirection:'row'}}>
+                  <Image style={{width: 15, height: 15, margin: 5}} source={require('./img/heartBlue.png')}/>
+                  <Text style={[styles.placesSecondaryText,{marginTop:2}]}>{this.props.currentPlace.rating}</Text>
+                </View>
+              </View>
+            </View>
+
         </ImageBackground>
-          <TouchableOpacity 
-            onPress={this.togglePin}
-            style={[styles.pinButton,{backgroundColor:buttonColor}]} >
-            <Text>{buttonText}</Text>
-          </TouchableOpacity>
-          <Text style={styles.welcome}>address {this.props.currentPlace.formatted_address}</Text>
-        <ImageBackground 
+
+        <TouchableOpacity 
+          onPress={this.togglePin}
+          style={[styles.pinButton,{backgroundColor:buttonColor}]} >
+          <Text style={styles.pinButtonText}>{buttonText}</Text>
+        </TouchableOpacity>
+       
+        <Text style={styles.welcome}>{this.props.currentPlace.formatted_address}</Text>
+       
+        <Image 
           style={{flex:2, width: '100%', height: '100%'}}  
-          source={{uri: getMapFromLatLng(this.props.currentPlace.lat,this.props.currentPlace.lng)}}>
-
-          
-
-        </ImageBackground>
+          source={{uri: getMapFromLatLng(this.props.currentPlace.lat,this.props.currentPlace.lng)}}/>
+        
       </View>
     );
   }
@@ -110,22 +121,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   pinButton: {
-    flex: 1,
     justifyContent: 'center',
 
     width:'90%',
-    height: 20,
+    height: 50,
     margin: 10, 
     borderRadius: 30,
   
   },
+  pinButtonText:{
+    fontSize: 16,
+    textAlign: 'center',
+  },
   primaryText: {
-    fontSize: 24,
+    fontSize: 28,
+    color: 'white',
+    textShadowColor:'#585858',
+    textShadowRadius:10,
     
   },
   secondaryText: {
-    fontSize: 14,
-    color: '#333333',
+    fontSize: 16,
+    color: 'white',
+    textShadowColor:'#585858',
+    textShadowRadius:10,
     marginBottom: 5,
   },
   left: {
