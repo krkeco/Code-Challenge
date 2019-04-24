@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 import { addPlace, setFromStorage } from './actions/place';
 import { setCurrentPlace } from './actions/currentPlace';
 
-import {getPhotoFromReference} from './utils.js';
+import {getPhotoFromReference, firebase, getFirebaseBookmarks} from './utils.js';
 
 const BOOKMARKS = 'bookmarks'
 const explorerRef = 'CmRaAAAAV9KxpdXWzTMaruLTL1Hrh82ZQ-50ksuNTTtdwTgiWgJpHHKDQ0WKpjSnZABBJRpJZkEluaLI-U8YdJp_WyuD1otsSafhjFVKlFTrW_kpXjaI2hUyzgj6aWvdcmgXrz1_EhAL-RmXTf3Jn4afw2CAHkDrGhT_ibn5dfC4ThZ6v89u01UWp3L4Cw';
@@ -27,6 +27,9 @@ class Bookmarks extends Component<Props> {
       location: '',
     }
   }
+
+
+
   componentDidMount(){
     let d = new Date(); 
     let hours = d.getHours();
@@ -36,8 +39,16 @@ class Bookmarks extends Component<Props> {
     }else if (hours  >= 12){
       this.setState({time: 'Afternoon'});
     }
+    
+    
+    // this.getBookmarksFromStorage();
 
-    this.getBookmarksFromStorage();
+    getFirebaseBookmarks(this.props.add);
+    // .then(
+    //     FBPlaces.map((place) =>{
+    //       // this.props.add(place)
+    //       alert('a place')
+    //     }))
     // this.deleteBookmarks();
     // alert(JSON.stringify(this.props.places))
   }

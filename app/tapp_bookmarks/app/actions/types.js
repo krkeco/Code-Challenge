@@ -1,0 +1,4 @@
+export const ADD_PLACE = 'ADD_PLACE'
+export const REMOVE_PLACE = 'REMOVE_PLACE'
+export const SET_FROM_STORAGE = 'SET_FROM_STORAGE'
+export const SET_CURRENT_PLACE = 'SET_CURRENT_PLACE'

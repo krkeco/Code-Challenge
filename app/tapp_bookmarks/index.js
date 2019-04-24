@@ -13,6 +13,16 @@ import Bookmarks from './app/Bookmarks.js';
 import Search from './app/Search.js';
 import Places from './app/Places.js';
 
+// var firebase = require("firebase");
+//   var config = {
+//     apiKey: "AIzaSyAgw31xvREQSTt2u-l_kl7eXOUoScHdNI8",
+//     authDomain: "tappsample.firebaseapp.com",
+//     databaseURL: "https://tappsample.firebaseio.com",
+//     projectId: "tappsample",
+//     storageBucket: "tappsample.appspot.com",
+//     messagingSenderId: "1054880327903"
+//   };
+//   firebase.initializeApp(config);
 
 const AppNavigator = createStackNavigator(
  {
