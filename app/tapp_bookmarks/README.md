@@ -1,10 +1,17 @@
 #Bookmarks App
 
 ##Install
-git clone 
-cd dir
-npm install
-react-native run
+
+-git clone 
+
+-cd dir
+
+-npm install
+
+-touch ./app/.env.js
+--add 'API_KEY=[your_google_api_key]'
+
+-react-native run-[android/ios]
 
 ###Met the following Requirements::
 
