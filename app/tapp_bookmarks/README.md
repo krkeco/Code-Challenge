@@ -2,14 +2,21 @@
 
 ##Install
 
--git clone 
+-Make sure you have NPM, React-Native, and Nodejs installed and up-to-date
 
--cd dir
+-clone this repository
+
+-cd Code-Challenge/app/tapp_bookmarks
 
 -npm install
 
+
 -touch ./app/.env.js
 --add 'API_KEY=[your_google_api_key]'
+
+-Android Only:
+--add local.properties file with sdk information
+---example: 'sdk.dir=/root/Android/Sdk'
 
 -react-native run-[android/ios]
 
@@ -31,8 +38,3 @@
   - Use Google Place Static Maps to show a image of location on map
   - Correct ‘Bookmark’ button depending on if place is bookmarked
 
-##TODO
-    
-    search 
-      styling
-      cancel button
